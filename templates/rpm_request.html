@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <Title>Diff</Title>
+  <form action="{{url_for('request_processor')}}" method="POST">
+    <dl>
+      <dd>1st package:
+      <dd><input type=text size=30 name=pkg1>
+      <br></br>
+      <dd>2nd package:
+      <dd><input type=text size=30 name=pkg2>
+      <br></br>
+      <dd><input type="submit" name="submit-form" value="Send">
+    </dl>
+  </form>
+{% endblock %}
