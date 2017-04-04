@@ -1,16 +1,37 @@
 {% extends "layout.html" %}
 
 {% block body %}
-  <Title>Diff</Title>
-  <form action="{{url_for('request_processor')}}" method="POST">
-    <dl>
-      <dd>1st package:
-      <dd><input type=text size=30 name=pkg1>
-      <br></br>
-      <dd>2nd package:
-      <dd><input type=text size=30 name=pkg2>
-      <br></br>
-      <dd><input type="submit" name="submit-form" value="Send">
-    </dl>
+  <form action="{{url_for('request_processor')}}" method="POST" class=diff_req>
+    <p>1st package:</p>
+    <input type=text size=30 name=pkg1>
+    <select required name=pkg1_release>
+      <option value="">Release</option>
+      <option value="25">25</option>
+      <option value="24">24</option>
+      <option value="23">23</option>
+    </select>
+    <select required name=pkg1_arch>
+      <option value="">Arch</option>
+      <option value="x86_64">64-bit</option>
+      <option value="i386">32-bit</option>
+      <option value="noarch">noarch</option>
+    </select>
+
+    <p>2nd package:</p>
+    <input type=text size=30 name=pkg2>
+     <select required name=pkg2_release>
+      <option value="">Release</option>
+      <option value="25">25</option>
+      <option value="24">24</option>
+      <option value="23">23</option>
+    </select>
+    <select required name=pkg2_arch>
+      <option value="">Arch</option>
+      <option value="x86_64">64-bit</option>
+      <option value="i386">32-bit</option>
+      <option value="noarch">noarch</option>
+    </select>
+    <br></br>
+    <input type="submit" name="submit-form" value="Send">
   </form>
 {% endblock %}

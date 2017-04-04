@@ -1,7 +1,15 @@
 <!doctype html>
-<title>Diff</title>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-<div class=page>
-  <h1>Diff</h1>
-  {% block body %}{% endblock %}
-</div>
+<head>
+  <title>Diff</title>
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+  <div class=menu>
+    <a href={{ url_for("get_rpm_request") }}>RPM Diff</a>
+  </div>
+  <div class=page>
+    <h1>Diff</h1>
+    {% block body %}{% endblock %}
+  </div>
+</body>
