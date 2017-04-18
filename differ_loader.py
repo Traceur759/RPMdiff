@@ -37,11 +37,15 @@ class Rpm_Differ(Differ):
                 pkg_name = entity
         return os.path.join(repodir, pkg_name)
 
-    def _download_pkg(self, pkg):
+    def _get_pkg(self, pkg):
         reponame = "{release}-{arch}".format(
                                             release=pkg[1],
                                             arch=pkg[2]
                                         )
+        pkgID = pkg[0] + "." + pkg[1] + "." + pkg[2]
+        if os.path.isfile("rpms/" + pkgID + ".rpm"):
+            return pkgID
+
         print("Release:%s\nArch:%s" % (pkg[1], pkg[2]))
         baseurl = "https://mirrors.nic.cz/fedora/linux/releases/{release}/Everything/{arch}/os/".format(
                                                                                                      release=pkg[1],
@@ -63,7 +67,6 @@ class Rpm_Differ(Differ):
                 print(package)
             self.base.download_packages(q)
             path = self.__get_package_path(pkg)
-            pkgID = pkg[0] + "." + pkg[1] + "." + pkg[2]
             copyfile(path, "rpms/"+ pkgID +".rpm")
             return pkgID
 
@@ -71,7 +74,7 @@ class Rpm_Differ(Differ):
         to_download = (self._pkg1, self._pkg2)
         pkgIDs = []
         for i, pkg in enumerate(to_download):
-            pkgID = self._download_pkg(pkg)
+            pkgID = self._get_pkg(pkg)
             print("ID: " + pkgID)
             pkgIDs.append(pkgID)
 

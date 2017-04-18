@@ -59,8 +59,6 @@ def request_processor():
         db.commit()
     else:
         result = ast.literal_eval(result[0])
-    for entity in result:
-        print(entity)
     db.close()
     important, unimportant = importance(result)
     return render_template("result.html", important=important, unimportant=unimportant)
