@@ -1,4 +1,13 @@
 {% extends "layout.html"%}
 {% block body %}
-  <xmp>{{result}}</xmp>
+  <p class=importance>
+  {% for format, text in important %}
+    {{ format % text }}<br>
+  {% endfor %}
+  </p>
+  <p class=importance>
+  {% for format, text in unimportant %}
+    {{ format % text }}<br>
+  {% endfor %}
+  </p>
 {% endblock %}
