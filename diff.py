@@ -7,15 +7,40 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_envvar("DIFF_SETTINGS", silent=True)
 
+def add_result(pkg, additional, result):
+    db = sqlite3.connect("results.db")
+    cur = db.cursor()
+    cur.execute("INSERT INTO results" +
+                "(pkg, pkg1_release, pkg1_arch, pkg2_release, pkg2_arch, result)" +
+                "values (?,?,?,?,?,?);",
+                (pkg, *additional, repr(result)))
+    db.commit()
+    db.close()
+
+def retrieve_result(pkg, additional):
+    db = sqlite3.connect("results.db")
+    cur = db.cursor()
+    cur.execute("SELECT result" +
+                "FROM results" +
+                "WHERE pkg=? AND" +
+                "pkg1_release=? AND" +
+                "pkg1_arch=? AND" +
+                "pkg2_release=? AND" +
+                "pkg2_arch=?",
+                (pkg, *additional)
+                )
+    result = cur.fetchone()
+    db.close()
+
 def importance(result):
-    important = []
-    unimportant = []
+    medium = []
+    low = []
     for format, text in result:
         if text[0] == "added" or text[0] == "removed":
-            important.append((format, text))
+            medium.append((format, text))
         else:
-            unimportant.append((format, text))
-    return important, unimportant
+            low.append((format, text))
+    return medium, low
 
 @app.cli.command("init_db")
 def init_db():
@@ -41,24 +66,17 @@ def request_processor():
                   request.form["pkg2_release"],
                   request.form["pkg2_arch"]
                 )
-    db = sqlite3.connect("results.db")
-    cur = db.cursor()
-    cur.execute("SELECT result FROM results WHERE pkg=? AND pkg1_release=? AND pkg1_arch=? AND pkg2_release=? AND pkg2_arch=?",(pkg, *additional))
-    result = cur.fetchone()
+    result = retrieve_result(pkg, additional)
     if result is None:
         differ = differ_loader.load_differ(pkg,
                                            pkg,
                                            "RPM",
                                            additional
                                           )
-        result = differ.get_diff()
-        id = cur.lastrowid
 
-        cur.execute("INSERT INTO results (pkg, pkg1_release, pkg1_arch, pkg2_release, pkg2_arch, result) values (?,?,?,?,?,?);",
-                    (pkg, *additional, repr(result)))
-        db.commit()
+        result = differ.get_diff()
+        add_result(pkg, additional, result)
     else:
         result = ast.literal_eval(result[0])
-    db.close()
-    important, unimportant = importance(result)
-    return render_template("result.html", important=important, unimportant=unimportant)
+    medium, low = importance(result)
+    return render_template("result.html", medium=medium, low=low)
